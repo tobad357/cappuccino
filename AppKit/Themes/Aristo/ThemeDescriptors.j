@@ -738,6 +738,13 @@ var themedButtonValues = nil,
         [@"text-color",         [CPColor colorWithCalibratedWhite:51.0 / 255.0 alpha:1.0], CPThemeStateTableDataView],
         [@"text-color",         [CPColor whiteColor],               CPThemeStateTableDataView | CPThemeStateSelectedTableDataView],
         [@"font",               [CPFont boldSystemFontOfSize:12.0], CPThemeStateTableDataView | CPThemeStateSelectedTableDataView],
+
+        [@"text-color",         [CPColor colorWithCalibratedWhite:125.0 / 255.0 alpha:1.0], CPThemeStateTableDataView|CPThemeStateGroupRow],
+        [@"text-color",         [CPColor colorWithCalibratedWhite:1.0 alpha:1.0], CPThemeStateTableDataView|CPThemeStateGroupRow|CPThemeStateSelectedTableDataView],
+        [@"text-shadow-color",  [CPColor whiteColor],                CPThemeStateTableDataView|CPThemeStateGroupRow],
+        [@"text-shadow-offset",  CGSizeMake(0,1),                    CPThemeStateTableDataView|CPThemeStateGroupRow],
+        [@"text-shadow-color",  [CPColor colorWithCalibratedWhite:0.0 alpha:0.6],                CPThemeStateTableDataView|CPThemeStateGroupRow|CPThemeStateSelectedTableDataView],
+        [@"font",               [CPFont boldSystemFontOfSize:12.0],  CPThemeStateTableDataView|CPThemeStateGroupRow]
     ];
 
     [self registerThemeValues:themedTextFieldValues forView:textfield];
@@ -848,7 +855,9 @@ var themedButtonValues = nil,
             [@"bezel-inset",    CGInsetMake(0.0, 0.0, 0.0, 0.0),    CPThemeStateBezeled],
             [@"content-inset",  CGInsetMake(1.0, 24.0, 2.0, 16.0),  CPThemeStateBezeled],
 
+            // Minimum height == maximum height since tokens are fixed height.
             [@"min-size",       CGSizeMake(0.0, 19.0)],
+            [@"max-size",       CGSizeMake(-1.0, 19.0)],
 
             [@"vertical-alignment", CPCenterTextAlignment],
         ];
@@ -1427,6 +1436,76 @@ var themedButtonValues = nil,
 
     return alert;
 }
+
++ (CPStepper)themedStepper
+{
+    var stepper = [CPStepper stepper],
+    
+        bezelUp = PatternColor(
+            [
+                ["stepper-bezel-big-up-left.png", 3.0, 13.0],
+                ["stepper-bezel-big-up-center.png", 13.0, 13.0],
+                ["stepper-bezel-big-up-right.png", 3.0, 13.0]
+            ],
+            PatternIsHorizontal),
+        
+        bezelDown = PatternColor(
+            [
+                ["stepper-bezel-big-down-left.png", 3.0, 12.0],
+                ["stepper-bezel-big-down-center.png", 13.0, 12.0],
+                ["stepper-bezel-big-down-right.png", 3.0, 12.0]
+            ],
+            PatternIsHorizontal),
+        
+        bezelUpDisabled = PatternColor(
+            [
+                ["stepper-bezel-big-disabled-up-left.png", 3.0, 13.0],
+                ["stepper-bezel-big-disabled-up-center.png", 13.0, 13.0],
+                ["stepper-bezel-big-disabled-up-right.png", 3.0, 13.0]
+            ],
+            PatternIsHorizontal),
+
+        bezelDownDisabled = PatternColor(
+            [
+                ["stepper-bezel-big-disabled-down-left.png", 3.0, 12.0],
+                ["stepper-bezel-big-disabled-down-center.png", 13.0, 12.0],
+                ["stepper-bezel-big-disabled-down-right.png", 3.0, 12.0]
+            ],
+            PatternIsHorizontal),
+        
+        bezelUpHighlighted = PatternColor(
+            [
+                [@"stepper-bezel-big-highlighted-up-left.png", 3.0, 13.0],
+                [@"stepper-bezel-big-highlighted-up-center.png", 13.0, 13.0],
+                [@"stepper-bezel-big-highlighted-up-right.png", 3.0, 13.0]
+            ],
+            PatternIsHorizontal),
+
+        bezelDownHighlighted = PatternColor(
+            [
+                [@"stepper-bezel-big-highlighted-down-left.png", 3.0, 12.0],
+                [@"stepper-bezel-big-highlighted-down-center.png", 13.0, 12.0],
+                [@"stepper-bezel-big-highlighted-down-right.png", 3.0, 12.0]
+            ],
+            PatternIsHorizontal),
+
+        themeValues =
+        [
+            [@"bezel-color-up-button",      bezelUp,                        CPThemeStateBordered],
+            [@"bezel-color-down-button",    bezelDown,                      CPThemeStateBordered],
+            [@"bezel-color-up-button",      bezelUpDisabled,                CPThemeStateBordered | CPThemeStateDisabled],
+            [@"bezel-color-down-button",    bezelDownDisabled,              CPThemeStateBordered | CPThemeStateDisabled],
+            [@"bezel-color-up-button",      bezelUpHighlighted,             CPThemeStateBordered | CPThemeStateHighlighted],
+            [@"bezel-color-down-button",    bezelDownHighlighted,           CPThemeStateBordered | CPThemeStateHighlighted],            
+            [@"min-size",                   CGSizeMake(19.0, 25.0)]
+        ];
+
+    [self registerThemeValues:themeValues forView:stepper];
+
+    return stepper;
+}
+
+
 
 @end
 

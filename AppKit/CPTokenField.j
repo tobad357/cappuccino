@@ -22,12 +22,13 @@
 
 @import <Foundation/CPCharacterSet.j>
 @import <Foundation/CPIndexSet.j>
+@import <Foundation/CPTimer.j>
 
-@import <AppKit/CPButton.j>
-@import <AppKit/_CPMenuWindow.j>
-@import <AppKit/CPScrollView.j>
-@import <AppKit/CPTextField.j>
-@import <AppKit/CPWindow.j>
+@import "CPButton.j"
+@import "CPScrollView.j"
+@import "CPTextField.j"
+@import "CPWindow.j"
+@import "_CPMenuWindow.j"
 
 #include "Platform/Platform.h"
 
@@ -969,15 +970,17 @@ var CPThemeStateAutoCompleting = @"CPThemeStateAutoCompleting",
     _tokenField = tokenField;
 }
 
-- (void)sizeToFit
+- (CGSize)_minimumFrameSize
 {
-    [super sizeToFit];
+    var size = CGRectMakeZero(),
+        minSize = [self currentValueForThemeAttribute:@"min-size"],
+        contentInset = [self currentValueForThemeAttribute:@"content-inset"];
 
-    var size = [self bounds].size,
-        minSize = [self currentValueForThemeAttribute:@"min-size"];
-
+    // Tokens are fixed height, so we could as well have used max-size here.
     size.height = minSize.height;
-    [self setFrameSize:size];
+    size.width = MAX(minSize.width, [([self stringValue] || @" ") sizeWithFont:[self font]].width + contentInset.left + contentInset.right);
+
+    return size;
 }
 
 - (void)layoutSubviews

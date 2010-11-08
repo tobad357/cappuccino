@@ -104,6 +104,7 @@ CPCriticalAlertStyle        = 2;
                                                 CGPointMake(15, 12),
                                                 [CPNull null],
                                                 [CPNull null],
+                                                [CPNull null],
                                                 [CPNull null]
                                                 ]
                                        forKeys:[@"size", @"content-inset", @"informative-offset", @"button-offset",
@@ -112,7 +113,8 @@ CPCriticalAlertStyle        = 2;
                                                 @"image-offset",
                                                 @"information-image",
                                                 @"warning-image",
-                                                @"error-image"
+                                                @"error-image",
+                                                @"bezel-color"
                                                 ]];
 }
 
@@ -157,8 +159,10 @@ CPCriticalAlertStyle        = 2;
 {
     var frame = CGRectMakeZero();
     frame.size = [self currentValueForThemeAttribute:@"size"];
-    _alertPanel = [[CPPanel alloc] initWithContentRect:frame styleMask:_windowStyle ? _windowStyle | CPTitledWindowMask : CPTitledWindowMask];
-
+    _alertPanel = [[CPPanel alloc] initWithContentRect:frame styleMask:_windowStyle ? _windowStyle | CPBorderlessWindowMask : CPBorderlessWindowMask];
+    
+    [_alertPanel setMovableByWindowBackground:YES];
+    
     var contentView = [_alertPanel contentView],
         count = [_buttons count];
 
@@ -332,7 +336,8 @@ CPCriticalAlertStyle        = 2;
     [_alertPanel setTitle:_windowTitle ? _windowTitle : theTitle];
     [_alertPanel setFloatingPanel:YES];
     [_alertPanel center];
-
+    [[_alertPanel contentView] setBackgroundColor:[self currentValueForThemeAttribute:@"bezel-color"]];
+    
     [_messageLabel setTextColor:[self currentValueForThemeAttribute:@"message-text-color"]];
     [_messageLabel setFont:[self currentValueForThemeAttribute:@"message-text-font"]];
     [_messageLabel setTextShadowColor:[self currentValueForThemeAttribute:@"message-text-shadow-color"]];
@@ -365,7 +370,10 @@ CPCriticalAlertStyle        = 2;
 
     var aRepresentativeButton = _buttons[0],
         buttonY = MAX(CGRectGetMaxY([_alertImageView frame]), CGRectGetMaxY(informationString ? [_informativeLabel frame] : [_messageLabel frame])) + buttonOffset; // the lower of the bottom of the text and the bottom of the icon.
-
+    
+    if (buttonY > CGRectGetHeight([_alertPanel frame]) - inset.bottom)
+        buttonY = CGRectGetHeight([_alertPanel frame]) - inset.bottom;
+    
     [aRepresentativeButton setTheme:[self theme]];
     [aRepresentativeButton sizeToFit];
 

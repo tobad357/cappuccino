@@ -28,7 +28,6 @@
 
 @import "CPTableHeaderView.j"
 
-#include "CoreGraphics/CGGeometry.h"
 
 CPTableColumnNoResizing         = 0;
 CPTableColumnAutoresizingMask   = 1 << 0;
@@ -378,6 +377,8 @@ CPTableColumnUserResizingMask   = 1 << 1;
 
 - (void)_postDidResizeNotificationWithOldWidth:(float)oldWidth
 {
+    [[self tableView] _didResizeTableColumn:self];
+
     [[CPNotificationCenter defaultCenter]
     postNotificationName:CPTableViewColumnDidResizeNotification
                   object:[self tableView]

@@ -26,8 +26,6 @@
 @import "CPControl.j"
 @import "CPStringDrawing.j"
 
-#include "CoreGraphics/CGGeometry.h"
-
 
 /* @group CPBezelStyle */
 
@@ -120,7 +118,7 @@ CPButtonImageOffset   = 3.0;
     return button;
 }
 
-+ (CPString)themeClass
++ (CPString)defaultThemeClass
 {
     return @"button";
 }
@@ -495,6 +493,9 @@ CPButtonImageOffset   = 3.0;
         size.height = MIN(size.height, maxSize.height);
 
     [self setFrameSize:size];
+
+    if (contentView)
+        [self layoutSubviews];
 }
 
 - (CGRect)rectForEphemeralSubviewNamed:(CPString)aName

@@ -28,10 +28,6 @@
 @import "CPView.j"
 @import "CPControl.j"
 
-#include "CoreGraphics/CGGeometry.h"
-
-#include "Platform/Platform.h"
-#include "Platform/DOM/CPDOMDisplayServer.h"
 
 var _CPimageAndTextViewFrameSizeChangedFlag         = 1 << 0,
     _CPImageAndTextViewImageChangedFlag             = 1 << 1,
@@ -718,7 +714,12 @@ var _CPimageAndTextViewFrameSizeChangedFlag         = 1 << 0,
         if (!_textSize)
             _textSize = [_text sizeWithFont:_font ? _font : [CPFont systemFontOfSize:12.0]];
 
-        if (_imagePosition === CPImageLeft || _imagePosition === CPImageRight)
+        if (!_image || _imagePosition === CPImageOverlaps)
+        {
+            size.width = MAX(size.width, _textSize.width);
+            size.height = MAX(size.height, _textSize.height);
+        }
+        else if (_imagePosition === CPImageLeft || _imagePosition === CPImageRight)
         {
             size.width += _textSize.width + _imageOffset;
             size.height = MAX(size.height, _textSize.height);
@@ -727,11 +728,6 @@ var _CPimageAndTextViewFrameSizeChangedFlag         = 1 << 0,
         {
             size.width = MAX(size.width, _textSize.width);
             size.height += _textSize.height + _imageOffset;
-        }
-        else // if (_imagePosition == CPImageOverlaps)
-        {
-            size.width = MAX(size.width, _textSize.width);
-            size.height = MAX(size.height, _textSize.height);
         }
     }
 

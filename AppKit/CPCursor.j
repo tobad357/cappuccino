@@ -12,8 +12,6 @@ Implemented class methods:
     Opera       : All except resizeLeftRightCursor resizeUpDownCursor operationNotAllowedCursor dragCopyCursor dragLinkCursor contextualMenuCursor openHandCursor closedHandCursor disappearingItemCursor // Opera does not support url cursors so these won't work with images
 */
 
-#include "Platform/Platform.h"
-
 @import <Foundation/CPObject.j>
 
 var currentCursor = nil,
@@ -212,8 +210,9 @@ var currentCursor = nil,
 
 - (id)initWithImage:(CPImage)image hotSpot:(CPPoint)hotSpot
 {
-    return [self initWithCSSString:"url(" + [image filename] + ")"];
+    return [self initWithCSSString:"url(" + [image filename] + "), auto"];
 }
+
 
 - (void)mouseEntered:(CPEvent)event
 {

@@ -1,4 +1,5 @@
 
+
 /*
  * CPArrayController.j
  * AppKit
@@ -25,8 +26,8 @@
 
 @import <Foundation/CPIndexSet.j>
 
-@import <AppKit/CPObjectController.j>
-@import <AppKit/CPKeyValueBinding.j>
+@import "CPObjectController.j"
+@import "CPKeyValueBinding.j"
 
 
 @implementation CPArrayController : CPObjectController
@@ -150,6 +151,9 @@
 
 - (void)setContent:(id)value
 {
+    if (value === nil)
+        value = [];
+
     if (![value isKindOfClass:[CPArray class]])
         value = [value];
 
@@ -201,7 +205,7 @@
 
 - (void)_setContentSet:(id)aSet
 {
-    [self setContent:aSet];
+    [self setContent:[aSet allObjects]];
 }
 
 - (id)contentArray
@@ -211,7 +215,7 @@
 
 - (id)contentSet
 {
-    return [self content];
+    return [CPSet setWithArray:[self content]];
 }
 
 - (CPArray)arrangeObjects:(CPArray)objects

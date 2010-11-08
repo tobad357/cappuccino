@@ -4,12 +4,14 @@
 @import <Foundation/CPDictionary.j>
 @import <Foundation/CPCoder.j>
 
-@implementation CPExpression_self : CPExpression{}
+@implementation CPExpression_self : CPExpression
+{
+}
 
 - (id)init
 {
     [super initWithExpressionType:CPEvaluatedObjectExpressionType];
-    
+
     return self;
 }
 
@@ -24,17 +26,12 @@
 
 - (BOOL)isEqual:(id)object
 {
-    return (object == self);
+    return (_type == CPEvaluatedObjectExpressionType);
 }
 
-- (id)expressionValueWithObject:object context:(CPDictionary)context
+- (id)expressionValueWithObject:(id)object context:(CPDictionary)context
 {
     return object;
-}
-
-- (CPExpression)_expressionWithSubstitutionVariables:(CPDictionary)variables
-{
-    return self;
 }
 
 - (CPString)description

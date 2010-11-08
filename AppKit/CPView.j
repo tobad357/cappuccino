@@ -35,11 +35,6 @@
 @import "_CPDisplayServer.j"
 
 
-#include "Platform/Platform.h"
-#include "CoreGraphics/CGAffineTransform.h"
-#include "CoreGraphics/CGGeometry.h"
-#include "Platform/DOM/CPDOMDisplayServer.h"
-
 /*
     @global
     @group CPViewAutoresizingMasks
@@ -179,6 +174,7 @@ var CPViewFlags                     = { },
 
     // Theming Support
     CPTheme             _theme;
+    CPString            _themeClass;
     JSObject            _themeAttributes;
     unsigned            _themeState;
 
@@ -1004,7 +1000,7 @@ var CPViewFlags                     = { },
 {
     var mask = [self autoresizingMask];
 
-    if(mask == CPViewNotSizable)
+    if (mask == CPViewNotSizable)
         return;
 
     var frame = _superview._frame,
@@ -1160,7 +1156,7 @@ var CPViewFlags                     = { },
 {
     aFlag = !!aFlag;
 
-    if(_isHidden === aFlag)
+    if (_isHidden === aFlag)
         return;
 
 //  FIXME: Should we return to visibility?  This breaks in FireFox, Opera, and IE.
@@ -1352,7 +1348,7 @@ var CPViewFlags                     = { },
 */
 - (CPView)hitTest:(CPPoint)aPoint
 {
-    if(_isHidden || !_hitTests || !CPRectContainsPoint(_frame, aPoint))
+    if (_isHidden || !_hitTests || !CPRectContainsPoint(_frame, aPoint))
         return nil;
 
     var view = nil,
@@ -1571,6 +1567,16 @@ var CPViewFlags                     = { },
 }
 
 /*!
+    Converts the point from the base coordinate system to the receiver’s coordinate system.
+    @param aPoint A point specifying a location in the base coordinate system
+    @return The point converted to the receiver’s base coordinate system
+*/
+- (CGPoint)convertPointFromBase:(CGPoint)aPoint
+{
+    return CGPointApplyAffineTransform(aPoint, _CPViewGetTransform(nil, self));
+}
+
+/*!
     Converts \c aPoint from the receiver's coordinate space to the coordinate space of \c aView.
     @param aPoint the point to convert
     @param aView the coordinate space to which the point will be converted
@@ -1579,6 +1585,16 @@ var CPViewFlags                     = { },
 - (CGPoint)convertPoint:(CGPoint)aPoint toView:(CPView)aView
 {
     return CGPointApplyAffineTransform(aPoint, _CPViewGetTransform(self, aView));
+}
+
+/*!
+    Converts the point from the receiver’s coordinate system to the base coordinate system.
+    @param aPoint A point specifying a location in the coordinate system of the receiver
+    @return The point converted to the base coordinate system
+*/
+- (CGPoint)convertPointToBase:(CGPoint)aPoint
+{
+    return CGPointApplyAffineTransform(aPoint, _CPViewGetTransform(self, nil));
 }
 
 /*!
@@ -1615,6 +1631,16 @@ var CPViewFlags                     = { },
 }
 
 /*!
+    Converts the rectangle from the base coordinate system to the receiver’s coordinate system.
+    @param aRect A rectangle specifying a location in the base coordinate system
+    @return The rectangle converted to the receiver’s base coordinate system
+*/
+- (CGRect)convertRectFromBase:(CGRect)aRect
+{
+    return CGRectApplyAffineTransform(aRect, _CPViewGetTransform(nil, self));
+}
+
+/*!
     Converts \c aRect from the receiver's coordinate space to \c aView's coordinate space.
     @param aRect the rectangle to convert
     @param aView the coordinate space to which the rectangle will be converted
@@ -1623,6 +1649,16 @@ var CPViewFlags                     = { },
 - (CGRect)convertRect:(CGRect)aRect toView:(CPView)aView
 {
     return CGRectApplyAffineTransform(aRect, _CPViewGetTransform(self, aView));
+}
+
+/*!
+    Converts the rectangle from the receiver’s coordinate system to the base coordinate system.
+    @param aRect  A rectangle specifying a location in the coordinate system of the receiver
+    @return The rectangle converted to the base coordinate system
+*/
+- (CGRect)convertRectToBase:(CGRect)aRect
+{
+    return CGRectApplyAffineTransform(aRect, _CPViewGetTransform(self, nil));
 }
 
 /*!
@@ -1960,7 +1996,7 @@ setBoundsOrigin:
     var superview = _superview,
         clipViewClass = [CPClipView class];
 
-    while(superview && ![superview isKindOfClass:clipViewClass])
+    while (superview && ![superview isKindOfClass:clipViewClass])
         superview = superview._superview;
 
     return superview;
@@ -2056,7 +2092,7 @@ setBoundsOrigin:
     var superview = _superview,
         scrollViewClass = [CPScrollView class];
 
-    while(superview && ![superview isKindOfClass:scrollViewClass])
+    while (superview && ![superview isKindOfClass:scrollViewClass])
         superview = superview._superview;
 
     return superview;
@@ -2252,9 +2288,27 @@ setBoundsOrigin:
 
 #pragma mark Theme Attributes
 
-+ (CPString)themeClass
++ (CPString)defaultThemeClass
 {
     return nil;
+}
+
+- (CPString)themeClass
+{
+    if (_themeClass)
+        return _themeClass;
+
+    return [[self class] defaultThemeClass];
+}
+
+- (void)setThemeClass:(CPString)theClass
+{
+    _themeClass = theClass;
+
+    [self _loadThemeAttributes];
+
+    [self setNeedsLayout];
+    [self setNeedsDisplay:YES];
 }
 
 + (CPDictionary)themeAttributes
@@ -2315,7 +2369,7 @@ setBoundsOrigin:
         return;
 
     var theme = [self theme],
-        themeClass = [theClass themeClass];
+        themeClass = [self themeClass];
 
     _themeAttributes = {};
 
@@ -2351,7 +2405,7 @@ setBoundsOrigin:
         return;
 
     var theme = [self theme],
-        themeClass = [[self class] themeClass];
+        themeClass = [self themeClass];
 
     for (var attributeName in _themeAttributes)
         if (_themeAttributes.hasOwnProperty(attributeName))
@@ -2455,7 +2509,7 @@ setBoundsOrigin:
 
     var frame = [self rectForEphemeralSubviewNamed:aViewName];
 
-    if (frame && !_CGRectIsEmpty(frame))
+    if (frame)
     {
         if (!_ephemeralSubviewsForNames[aViewName])
         {
@@ -2502,6 +2556,7 @@ var CPViewAutoresizingMaskKey       = @"CPViewAutoresizingMask",
     CPViewSubviewsKey               = @"CPViewSubviewsKey",
     CPViewSuperviewKey              = @"CPViewSuperviewKey",
     CPViewTagKey                    = @"CPViewTagKey",
+    CPViewThemeClassKey             = @"CPViewThemeClassKey",
     CPViewThemeStateKey             = @"CPViewThemeStateKey",
     CPViewWindowKey                 = @"CPViewWindowKey",
     CPViewNextKeyViewKey            = @"CPViewNextKeyViewKey",
@@ -2581,11 +2636,12 @@ var CPViewAutoresizingMaskKey       = @"CPViewAutoresizingMask",
         [self setupViewFlags];
 
         _theme = [CPTheme defaultTheme];
+        _themeClass = [aCoder decodeObjectForKey:CPViewThemeClassKey];
         _themeState = CPThemeState([aCoder decodeIntForKey:CPViewThemeStateKey]);
         _themeAttributes = {};
 
         var theClass = [self class],
-            themeClass = [theClass themeClass],
+            themeClass = [self themeClass],
             attributes = [theClass _themeAttributes],
             count = attributes.length;
 
@@ -2668,6 +2724,7 @@ var CPViewAutoresizingMaskKey       = @"CPViewAutoresizingMask",
     if (previousKeyView !== nil)
         [aCoder encodeConditionalObject:previousKeyView forKey:CPViewPreviousKeyViewKey];
 
+    [aCoder encodeObject:[self themeClass] forKey:CPViewThemeClassKey];
     [aCoder encodeInt:CPThemeStateName(_themeState) forKey:CPViewThemeStateKey];
 
     for (var attributeName in _themeAttributes)

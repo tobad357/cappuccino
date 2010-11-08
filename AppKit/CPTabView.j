@@ -1,7 +1,7 @@
-@import <AppKit/CPBox.j>
-@import <AppKit/CPSegmentedControl.j>
-@import <AppKit/CPTabViewItem.j>
-@import <AppKit/CPView.j>
+@import "CPBox.j"
+@import "CPSegmentedControl.j"
+@import "CPTabViewItem.j"
+@import "CPView.j"
 
 /*
     Places tabs on top with a bezeled border.
@@ -59,62 +59,31 @@ var HEIGHT_OF_SEGMENTED_CONTROL = 24;
     if (self)
     {
         items = [CPArray array];
-
-        tabs = [[CPSegmentedControl alloc] initWithFrame:CGRectMake(0, 0, 0, HEIGHT_OF_SEGMENTED_CONTROL)];
-        [tabs setHitTests:NO];
-
-        box = [[CPBox alloc] initWithFrame:CGRectMake(0, HEIGHT_OF_SEGMENTED_CONTROL / 2, CGRectGetWidth(aFrame),
-                                                            CGRectGetHeight(aFrame) - HEIGHT_OF_SEGMENTED_CONTROL)];
-
         selectedIndex = CPNotFound;
-
         [self setTabViewType:CPTopTabsBezelBorder];
-        [self setBackgroundColor:[CPColor colorWithCalibratedWhite:0.95 alpha:1.0]];
 
-        [self addSubview:box];
-        [self addSubview:tabs];
+        [self _init];
     }
     return self;
 }
 
-/*!
-    Override CPView message to allow to set the autoresizing mask
-    of the tabview and it's subview
-
-    @param unsigned aMask the autoresizing mask
-*/
-- (void)setAutoresizingMask:(unsigned)aMask
+- (void)_init
 {
-    [box setAutoresizingMask:aMask];
+    tabs = [[CPSegmentedControl alloc] initWithFrame:CGRectMake(0, 0, 0, HEIGHT_OF_SEGMENTED_CONTROL)];
+    [tabs setHitTests:NO];
 
-    [super setAutoresizingMask:aMask];
-}
+    var aFrame = [self frame];
 
+    box = [[CPBox alloc] initWithFrame:CGRectMake(0, HEIGHT_OF_SEGMENTED_CONTROL / 2, CGRectGetWidth(aFrame),
+                                                        CGRectGetHeight(aFrame) - HEIGHT_OF_SEGMENTED_CONTROL)];
 
-/*!
-    Override the CPView method in order
-    to allow to reposition the segmented control
+    [self setBackgroundColor:[CPColor colorWithCalibratedWhite:0.95 alpha:1.0]];
 
-    @param aFrame the new frame
-*/
-- (void)setFrame:(CGRect)aFrame
-{
-    [super setFrame:aFrame];
+    [self addSubview:box];
+    [self addSubview:tabs];
 
-    [self _repositionTabs];
-}
-
-/*!
-    Override the CPView method in order
-    to allow to reposition the segmented control
-
-    @param someBounds the new bounds
-*/
-- (void)setBounds:(CGRect)someBounds
-{
-    [super setBounds:someBounds];
-
-    [self _repositionTabs];
+    [box setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
+    [tabs setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin];
 }
 
 // Adding and Removing Tabs
@@ -456,8 +425,9 @@ var CPTabViewItemsKey               = "CPTabViewItemsKey",
 {
     if (self = [super initWithCoder:aCoder])
     {
-        type    = [aCoder decodeIntForKey:CPTabViewTypeKey];
         items   = [];
+
+        [self _init];
 
         var encodedItems = [aCoder decodeObjectForKey:CPTabViewItemsKey];
         for (var i = 0; encodedItems && i < encodedItems.length; i++)
@@ -468,6 +438,8 @@ var CPTabViewItemsKey               = "CPTabViewItemsKey",
             [self selectTabViewItem:selected];
 
         [self setDelegate:[aCoder decodeObjectForKey:CPTabViewDelegateKey]];
+
+        [self setTabViewType:[aCoder decodeIntForKey:CPTabViewTypeKey]];
     }
 
     return self;

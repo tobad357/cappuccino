@@ -1437,27 +1437,17 @@ var themedButtonValues = nil,
 + (CPAlert)themedAlert
 {
     var alert = [CPAlert new],
-        size = CGSizeMake(404.0, 207.0),
-        inset = CGInsetMake(35, 25, 30, 100),
-        buttonOffset = 64.0;
-        imageOffset = CGPointMake(36, 38),
+        size = CGSizeMake(400.0, 110.0),
+        inset = CGInsetMake(15, 15, 15, 80),
+        imageOffset = CGPointMake(15, 18),
+        buttonOffset = 10.0,
+        alertBezelColor = nil,
+        
         messageFont = [CPFont boldSystemFontOfSize:13.0],
         informativeFont = [CPFont systemFontOfSize:12.0],
         informationIcon = PatternImage("alert-info.png", 53.0, 46.0),
         warningIcon = PatternImage("alert-warning.png", 53.0, 46.0),
         errorIcon = PatternImage("alert-error.png", 53.0, 46.0),
-        alertBezelColor = PatternColor(
-            [
-                ["alert-bezel-0.png", 24.0, 63.0],
-                ["alert-bezel-1.png", 1.0, 63.0],
-                ["alert-bezel-2.png", 24.0, 63.0],
-                ["alert-bezel-3.png", 24.0, 1.0],
-                ["alert-bezel-4.png", 1.0, 1.0],
-                ["alert-bezel-5.png", 24.0, 1.0],
-                ["alert-bezel-6.png", 24.0, 25.0],
-                ["alert-bezel-7.png", 1.0, 25.0],
-                ["alert-bezel-8.png", 24.0, 25.0]
-            ]),
         
         
     themedAlertValues =

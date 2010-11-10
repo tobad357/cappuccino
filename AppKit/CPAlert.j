@@ -76,10 +76,10 @@ CPCriticalAlertStyle        = 2;
 @implementation CPAlert : CPView
 {
     BOOL            _showHelp               @accessors(getter=showsHelp, setter=setShowsHelp:);
-    BOOL            _showSupressionButton   @accessors(getter=showsSupressionButton);
+    BOOL            _showSuppressionButton  @accessors(getter=showsSuppressionButton);
     CPAlertStyle    _alertStyle             @accessors(property=alertStyle);
     CPArray         _buttons                @accessors(getter=buttons);
-    CPCheckBox      _supressionButton       @accessors(getter=suppressionButton);
+    CPCheckBox      _suppressionButton      @accessors(getter=suppressionButton);
     CPImage         _icon                   @accessors(property=icon);
     CPString        _helpAnchor             @accessors(property=helpAnchor);
     CPView          _accessoryView          @accessors(getter=accessoryView);
@@ -159,7 +159,7 @@ CPCriticalAlertStyle        = 2;
         _messageLabel       = [CPTextField labelWithTitle:@"Alert"];
         _alertImageView     = [[CPImageView alloc] initWithFrame:CGRectMakeZero()];
         _informativeLabel   = [[CPTextField alloc] initWithFrame:CGRectMakeZero()];
-        _supressionButton   = [CPCheckBox checkBoxWithTitle:@"Do not show this message again"];
+        _suppressionButton  = [CPCheckBox checkBoxWithTitle:@"Do not show this message again"];
         _showHelp           = NO;
         _needsLayout        = YES;
 
@@ -206,11 +206,11 @@ CPCriticalAlertStyle        = 2;
 #pragma mark -
 #pragma mark Custom getters and setters
 
-/*! return the window of the alert
+/*! return the alert's CPPanel
 */
 - (CPWindow)window
 {
-    return [_alertPanel window];
+    return _alertPanel;
 }
 
 /*! set the text of the alert's message
@@ -282,13 +282,13 @@ CPCriticalAlertStyle        = 2;
     _needsLayout = YES;
 }
 
-/*! set if alert shows the supression button
+/*! set if alert shows the suppression button
 
-    @param shouldShowSupressionButton YES or NO
+    @param shouldShowSuppressionButton YES or NO
 */
-- (void)setShowsSupressionButton:(BOOL)shouldShowSupressionButton
+- (void)setShowsSuppressionButton:(BOOL)shouldShowSuppressionButton
 {
-    _showSupressionButton = shouldShowSupressionButton;
+    _showSuppressionButton = shouldShowSuppressionButton;
     _needsLayout = YES;
 }
 
@@ -402,16 +402,16 @@ CPCriticalAlertStyle        = 2;
 */
 - (void)_layoutSuppressionButton
 {
-    if (_showSupressionButton)
+    if (_showSuppressionButton)
     {
         var inset = [self currentValueForThemeAttribute:@"content-inset"],
-            suppressionViewXOffset = [self currentValueForThemeAttribute:@"supression-button-x-offset"],
-            suppressionViewYOffset = [self currentValueForThemeAttribute:@"supression-button-y-offset"],
+            suppressionViewXOffset = [self currentValueForThemeAttribute:@"suppression-button-x-offset"],
+            suppressionViewYOffset = [self currentValueForThemeAttribute:@"suppression-button-y-offset"],
             defaultElementsMargin = [self currentValueForThemeAttribute:@"default-elements-margin"],
             suppressionButtonViewOriginY = CPRectGetMaxY([(_accessoryView || _informativeLabel) frame]) + defaultElementsMargin + suppressionViewYOffset;
 
-        [_supressionButton setFrameOrigin:CGPointMake(inset.left + suppressionViewXOffset, suppressionButtonViewOriginY)];
-        [[_alertPanel contentView] addSubview:_supressionButton];
+        [_suppressionButton setFrameOrigin:CGPointMake(inset.left + suppressionViewXOffset, suppressionButtonViewOriginY)];
+        [[_alertPanel contentView] addSubview:_suppressionButton];
     }
 }
 
@@ -517,8 +517,8 @@ CPCriticalAlertStyle        = 2;
     [self _layoutSuppressionButton];
 
     var lastView = _informativeLabel;
-    if (_showSupressionButton)
-        lastView = _supressionButton;
+    if (_showSuppressionButton)
+        lastView = _suppressionButton;
     else if (_accessoryView)
         lastView = _accessoryView
 
@@ -651,8 +651,8 @@ CPCriticalAlertStyle        = 2;
                                                 @"help-image",
                                                 @"help-image-left-offset",
                                                 @"help-image-pressed",
-                                                @"supression-button-y-offset",
-                                                @"supression-button-x-offset",
+                                                @"suppression-button-y-offset",
+                                                @"suppression-button-x-offset",
                                                 @"default-elements-margin"
                                                 ]];
 }
